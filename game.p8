@@ -10,8 +10,6 @@ domino_colors = {
   11, -- 2: light blue
   10, -- 3: green
   5,  -- 4: red
-  12, -- 5
-  13  -- 6
 }
 
 GRID_W = 4
@@ -29,17 +27,50 @@ function _update()
   end
 end
 
+function get_board_anchor(board)
+  local min_x, min_y = GRID_W, GRID_H
+  for x=1, GRID_W do
+    for y=1, GRID_H do
+      if board[x][y] and board[x][y] > 0 then
+        if x < min_x then min_x = x end
+        if y < min_y then min_y = y end
+      end
+    end
+  end
+  return min_x, min_y
+end
+
 function _draw()
   cls()
-  local x_offset = 64 - (GRID_W * 8 / 2)
-  local y_offset = 64 - (GRID_H * 8 / 2)
+  local size = 20
+  local anchor_x, anchor_y = get_board_anchor(board)
   for x=1, GRID_W do
     for y=1, GRID_H do
       if board[x][y] and board[x][y] > 0 then
         local color_index = board[x][y]
         local color = domino_colors[color_index]
-        rectfill(x_offset + (x-1)*8, y_offset + (y-1)*8, x_offset + x*8 - 1, y_offset + y*8 - 1, color)
-        rect(x_offset + (x-1)*8, y_offset + (y-1)*8, x_offset + x*8 - 1, y_offset + y*8 - 1, 0)
+          local cell_x = (x-anchor_x)*size
+          local cell_y = (y-anchor_y)*size
+          local cell_x2 = cell_x + size - 1
+          local cell_y2 = cell_y + size - 1
+          local seg = 4 -- segment length
+          local gap = 4 -- gap length
+          -- Top edge
+          for i=0, size-1, seg+gap do
+            line(cell_x+i, cell_y, min(cell_x+i+seg-1, cell_x2), cell_y, color)
+          end
+          -- Bottom edge
+          for i=0, size-1, seg+gap do
+            line(cell_x+i, cell_y2, min(cell_x+i+seg-1, cell_x2), cell_y2, color)
+          end
+          -- Left edge
+          for i=0, size-1, seg+gap do
+            line(cell_x, cell_y+i, cell_x, min(cell_y+i+seg-1, cell_y2), color)
+          end
+          -- Right edge
+          for i=0, size-1, seg+gap do
+            line(cell_x2, cell_y+i, cell_x2, min(cell_y+i+seg-1, cell_y2), color)
+          end
       end
     end
   end
