@@ -14,8 +14,16 @@ function init_board(grid_w, grid_h, num_dominoes, domino_colors)
   local board = {}
   for x=1, grid_w do
     board[x] = {}
+    for y=1, grid_h do
+      board[x][y] = init_cell(x, y, 0)
+    end
+  end
+  
+  function board:draw(anchor_x, anchor_y, size, domino_colors)
+    for x=1, grid_w do
       for y=1, grid_h do
-        board[x][y] = init_cell()
+        self[x][y]:draw(anchor_x, anchor_y, size, domino_colors)
+      end
     end
   end
 
