@@ -3,10 +3,10 @@ function is_valid_pos(x, y)
 end
 
 function is_adjacent_to_board(x, y, board)
-  if is_valid_pos(x-1, y) and board[x-1][y] > 0 then return true end
-  if is_valid_pos(x+1, y) and board[x+1][y] > 0 then return true end
-  if is_valid_pos(x, y-1) and board[x][y-1] > 0 then return true end
-  if is_valid_pos(x, y+1) and board[x][y+1] > 0 then return true end
+  if is_valid_pos(x-1, y) and board[x-1][y].color > 0 then return true end
+  if is_valid_pos(x+1, y) and board[x+1][y].color > 0 then return true end
+  if is_valid_pos(x, y-1) and board[x][y-1].color > 0 then return true end
+  if is_valid_pos(x, y+1) and board[x][y+1].color > 0 then return true end
   return false
 end
 
@@ -14,8 +14,8 @@ function init_board(grid_w, grid_h, num_dominoes, domino_colors)
   local board = {}
   for x=1, grid_w do
     board[x] = {}
-    for y=1, grid_h do
-      board[x][y] = 0
+      for y=1, grid_h do
+        board[x][y] = init_cell()
     end
   end
 
@@ -30,7 +30,7 @@ function populate_board(board)
     -- Clear board
     for x=1, GRID_W do
       for y=1, GRID_H do
-        board[x][y] = 0
+        board[x][y].color = 0
       end
     end
 
@@ -40,11 +40,11 @@ function populate_board(board)
     if orient == 0 and start_x == GRID_W then start_x = GRID_W - 1 end
     if orient == 1 and start_y == GRID_H then start_y = GRID_H - 1 end
 
-    board[start_x][start_y] = 1
+    board[start_x][start_y].color = 1
     if orient == 0 then
-      board[start_x + 1][start_y] = 1
+      board[start_x + 1][start_y].color = 1
     else
-      board[start_x][start_y + 1] = 1
+      board[start_x][start_y + 1].color = 1
     end
 
     -- 2. Place the remaining dominoes
@@ -52,15 +52,15 @@ function populate_board(board)
       local possible_placements = {}
       for x=1, GRID_W do
         for y=1, GRID_H do
-          if board[x][y] == 0 then
+          if board[x][y].color == 0 then
             -- Check for horizontal placement
-            if is_valid_pos(x+1, y) and board[x+1][y] == 0 then
+            if is_valid_pos(x+1, y) and board[x+1][y].color == 0 then
               if is_adjacent_to_board(x, y, board) or is_adjacent_to_board(x+1, y, board) then
                 add(possible_placements, {x=x, y=y, orient=0})
               end
             end
             -- Check for vertical placement
-            if is_valid_pos(x, y+1) and board[x][y+1] == 0 then
+            if is_valid_pos(x, y+1) and board[x][y+1].color == 0 then
               if is_adjacent_to_board(x, y, board) or is_adjacent_to_board(x, y+1, board) then
                 add(possible_placements, {x=x, y=y, orient=1})
               end
@@ -72,11 +72,11 @@ function populate_board(board)
         goto continue_generation_attempt
       end
       local chosen_placement = possible_placements[flr(rnd(#possible_placements)) + 1]
-      board[chosen_placement.x][chosen_placement.y] = d
+      board[chosen_placement.x][chosen_placement.y].color = d
       if chosen_placement.orient == 0 then
-        board[chosen_placement.x+1][chosen_placement.y] = d
+        board[chosen_placement.x+1][chosen_placement.y].color = d
       else
-        board[chosen_placement.x][chosen_placement.y+1] = d
+        board[chosen_placement.x][chosen_placement.y+1].color = d
       end
     end
     success = true
