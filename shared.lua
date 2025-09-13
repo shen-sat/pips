@@ -1,1 +1,8 @@
--- Shared utility functions for pips project
+function in_table(table, item)
+  for i=1, #table do
+    if table[i] == item then
+      return true
+    end
+  end
+  return false
+end

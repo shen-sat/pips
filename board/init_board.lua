@@ -49,7 +49,7 @@ function init_data(board)
     end
 
     -- 2. Place the remaining dominoes
-    for d = 2, NUM_DOMINOES do
+    for d = 2, #DOMINO_COLORS do
       local possible_placements = {}
       for x=1, GRID_W do
         for y=1, GRID_H do
