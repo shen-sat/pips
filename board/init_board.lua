@@ -1,38 +1,31 @@
-function is_valid_pos(x, y)
-  return x >= 1 and x <= GRID_W and y >= 1 and y <= GRID_H
-end
-
-function is_adjacent_to_board(x, y, board)
-  if is_valid_pos(x-1, y) and board[x-1][y].color > 0 then return true end
-  if is_valid_pos(x+1, y) and board[x+1][y].color > 0 then return true end
-  if is_valid_pos(x, y-1) and board[x][y-1].color > 0 then return true end
-  if is_valid_pos(x, y+1) and board[x][y+1].color > 0 then return true end
-  return false
-end
-
-function init_board(grid_w, grid_h, num_dominoes, domino_colors)
+function init_board()
   local board = {}
-  for x=1, grid_w do
+  for x=1, GRID_W do
     board[x] = {}
-    for y=1, grid_h do
-      board[x][y] = init_cell(x, y, 0)
+    for y=1, GRID_H do
+      board[x][y] = {color=0}
     end
   end
-  
-  function board:draw(anchor_x, anchor_y, size, domino_colors)
-    for x=1, grid_w do
-      for y=1, grid_h do
-        self[x][y]:draw(anchor_x, anchor_y, size, domino_colors)
+  -- this will return the most top-left non-zero datum
+  function board:get_board_anchor()
+    local min_x, min_y = GRID_W, GRID_H
+    for x=1, GRID_W do
+      for y=1, GRID_H do
+        if board[x][y] and board[x][y].color and board[x][y].color > 0 then
+          if x < min_x then min_x = x end
+          if y < min_y then min_y = y end
+        end
       end
     end
+    return min_x, min_y
   end
-
-  populate_board(board)
-
+  -- this will decide the placement of dominoes on the board
+  init_data(board)
+  
   return board
 end
 
-function populate_board(board)
+function init_data(board)
   local success = false
   for attempt = 1, 20 do -- MAX_ATTEMPTS
     -- Clear board
@@ -94,4 +87,16 @@ function populate_board(board)
   if not success then
     print("board gen failed")
   end
+end
+
+function is_valid_pos(x, y)
+  return x >= 1 and x <= GRID_W and y >= 1 and y <= GRID_H
+end
+
+function is_adjacent_to_board(x, y, board)
+  if is_valid_pos(x-1, y) and board[x-1][y].color > 0 then return true end
+  if is_valid_pos(x+1, y) and board[x+1][y].color > 0 then return true end
+  if is_valid_pos(x, y-1) and board[x][y-1].color > 0 then return true end
+  if is_valid_pos(x, y+1) and board[x][y+1].color > 0 then return true end
+  return false
 end
